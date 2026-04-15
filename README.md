@@ -1,160 +1,101 @@
-# ROS 2 Maze Navigation with TurtleBot3
+# مشروع ROS 2 للملاحة في المتاهة باستخدام TurtleBot3
 
-Autonomous maze navigation project built with **ROS 2 Jazzy**, **Gazebo Harmonic**, and **TurtleBot3 Burger** using the **Potential Field Method** for local navigation and obstacle avoidance.
+يهدف هذا المشروع إلى استكشاف قدرات الملاحة الذاتية للروبوتات في بيئات المتاهة، وذلك باستخدام إطار عمل ROS 2 (Robot Operating System 2) وروبوت TurtleBot3 Burger في محاكاة Gazebo.
 
-## Highlights
+## نظرة عامة على المشروع
 
-*   ROS 2 Jazzy + Gazebo Harmonic integration
-*   TurtleBot3 Burger simulation and spawn pipeline
-*   `ros_gz_bridge` for `/scan`, `/odom`, `/cmd_vel`, and `/clock`
-*   Potential Field local navigation with attractive and repulsive forces
-*   Invalid LiDAR filtering for `0.0`, `inf`, and `nan`
-*   Stable **simple-maze** navigation with **0.20 m** goal tolerance
+يقوم هذا المشروع بتطبيق خوارزمية **حقل الجهد (Potential Field Method)** لتمكين روبوت TurtleBot3 من التنقل في متاهة افتراضية. تعتمد الخوارزمية على توليد قوى جاذبة نحو الهدف وقوى تنافرية بعيداً عن العوائق، مما يسمح للروبوت بالتحرك بسلاسة وتجنب الاصطدامات للوصول إلى النقطة المحددة.
 
-## Project Summary
+## الميزات الرئيسية
 
-This project implements autonomous maze navigation in Gazebo Sim using a TurtleBot3 Burger robot. The robot is spawned in a maze world, receives **LiDAR** and **odometry** data through `ros_gz_bridge`, computes **attractive** and **repulsive** forces, and publishes velocity commands to move safely toward a goal while avoiding collisions.
+*   **تكامل ROS 2 Jazzy و Gazebo Harmonic:** استخدام أحدث إصدارات ROS 2 ومحاكي Gazebo لتوفير بيئة محاكاة قوية وواقعية.
+*   **محاكاة TurtleBot3 Burger:** دمج روبوت TurtleBot3 Burger في بيئة Gazebo، مع إعداد كامل لنموذج الروبوت ومستشعراته.
+*   **جسر `ros_gz_bridge`:** استخدام الجسر لربط البيانات بين ROS 2 و Gazebo، بما في ذلك بيانات LiDAR (`/scan`)، بيانات تحديد المواقع (`/odom`)، أوامر السرعة (`/cmd_vel`)، وساعة المحاكاة (`/clock`).
+*   **خوارزمية حقل الجهد:** تطبيق فعال لخوارزمية حقل الجهد للملاحة المحلية وتجنب العوائق.
+*   **معالجة بيانات LiDAR:** تصفية قراءات LiDAR غير الصالحة (مثل `0.0`، `inf`، و `nan`) لضمان دقة حسابات القوى التنافرية.
+*   **تحديد الهدف والتوقف:** قدرة الروبوت على تحديد الهدف والتوقف بدقة ضمن مسافة تحمل محددة (0.20 متر).
 
-The main submission path focuses on the **base project** in the **simple maze** environment.
+## مكونات المستودع
 
-## Robot and Environment
+يحتوي هذا المستودع على حزمة `maze_navigation` المخصصة، والتي تتضمن:
 
-*   **Robot:** TurtleBot3 Burger
-*   **ROS 2 version:** Jazzy
-*   **Simulator:** Gazebo Harmonic / `ros_gz`
-*   **Base world:** `simple_maze.world`
-*   **Default spawn point:** `(0.5, 0.5)`
-*   **Default goal point:** `(9.0, 9.0)`
+*   `launch/maze_sim.launch.py`: ملف إطلاق (launch file) يقوم بتهيئة بيئة المحاكاة، وإطلاق روبوت TurtleBot3، وتفعيل جسر `ros_gz_bridge`، وتشغيل عقدة الملاحة.
+*   `maze_navigation/potential_field_planner.py`: عقدة ROS 2 التي تحتوي على تطبيق خوارزمية حقل الجهد، وتتولى معالجة بيانات المستشعرات، وحساب القوى، وإصدار أوامر السرعة.
+*   `worlds/simple_maze.world`: ملف وصف العالم الخاص بالمتاهة البسيطة المستخدمة في المحاكاة.
 
-## Repository Scope
+## المتطلبات الأساسية
 
-This repository contains the custom `maze_navigation` package only.
+تم اختبار هذا المشروع على الأنظمة التالية:
 
-The TurtleBot3 packages are external upstream dependencies and should be cloned into the same ROS 2 workspace as shown below.
-
-## Repository Contents
-
-*   `launch/maze_sim.launch.py` — launches the base/simple maze configuration
-*   `maze_navigation/potential_field_planner.py` — base Potential Field planner
-*   `worlds/simple_maze.world` — base maze world
-
-## Prerequisites
-
-Tested on:
-
-*   Ubuntu 24.04
-*   WSL Ubuntu 24.04
+*   Ubuntu 24.04 (أو WSL Ubuntu 24.04)
 *   ROS 2 Jazzy
 *   Gazebo Harmonic
 
-You should already have:
+يجب أن تكون لديك بيئة ROS 2 Jazzy و Gazebo Sim مثبتة مسبقاً.
 
-*   ROS 2 Jazzy installed
-*   Gazebo Sim installed
-*   GUI support working if using WSL
+## التبعيات المطلوبة
 
-## Required Dependencies
+قم بتثبيت حزم ROS و Gazebo الضرورية باستخدام الأوامر التالية:
 
-Install the required ROS / Gazebo packages:
-
-```shell
+```bash
 sudo apt update
 sudo apt install -y \
   ros-jazzy-ros-gz \
   ros-jazzy-dynamixel-sdk
 ```
 
-## Quick Start
+## دليل البدء السريع
 
-```shell
-mkdir -p ~/ros2_project_ws/src
-cd ~/ros2_project_ws/src
-git clone https://github.com/Ahmedosrf/ros2-maze-navigation.git maze_navigation
-git clone -b jazzy https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git
-git clone -b jazzy https://github.com/ROBOTIS-GIT/turtlebot3.git
-git clone -b jazzy https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
-cd ~/ros2_project_ws
-source /opt/ros/jazzy/setup.bash
-rosdep install --from-paths src --ignore-src -r -y
-colcon build --symlink-install
-source ~/ros2_project_ws/install/setup.bash
-export TURTLEBOT3_MODEL=burger
-ros2 launch maze_navigation maze_sim.launch.py
-```
+لإعداد وتشغيل المشروع بسرعة، اتبع الخطوات التالية:
 
-## Step-by-Step Build and Launch Instructions
+1.  **إنشاء مساحة عمل ROS 2:**
+    ```bash
+    mkdir -p ~/ros2_project_ws/src
+    cd ~/ros2_project_ws/src
+    ```
 
-### Step 1: Create a ROS 2 workspace
+2.  **استنساخ هذا المستودع:**
+    ```bash
+    git clone https://github.com/Ahmedosrf/ros2-maze-navigation.git maze_navigation
+    ```
 
-```shell
-mkdir -p ~/ros2_project_ws/src
-cd ~/ros2_project_ws/src
-```
+3.  **استنساخ مستودعات TurtleBot3 المطلوبة:**
+    ```bash
+    git clone -b jazzy https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git
+    git clone -b jazzy https://github.com/ROBOTIS-GIT/turtlebot3.git
+    git clone -b jazzy https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
+    ```
 
-### Step 2: Clone this repository
+4.  **تثبيت تبعيات مساحة العمل:**
+    ```bash
+    cd ~/ros2_project_ws
+    source /opt/ros/jazzy/setup.bash
+    rosdep install --from-paths src --ignore-src -r -y
+    ```
 
-```shell
-git clone https://github.com/Ahmedosrf/ros2-maze-navigation.git maze_navigation
-```
+5.  **بناء مساحة العمل:**
+    ```bash
+    colcon build --symlink-install
+    ```
 
-### Step 3: Clone the required TurtleBot3 repositories
+6.  **تفعيل مساحة العمل وتحديد نموذج TurtleBot3:**
+    ```bash
+    source install/setup.bash
+    export TURTLEBOT3_MODEL=burger
+    ```
 
-```shell
-git clone -b jazzy https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git
-git clone -b jazzy https://github.com/ROBOTIS-GIT/turtlebot3.git
-git clone -b jazzy https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
-```
+7.  **تشغيل المشروع:**
+    ```bash
+    ros2 launch maze_navigation maze_sim.launch.py
+    ```
 
-### Step 4: Install workspace dependencies
+سيؤدي هذا الأمر إلى إطلاق Gazebo مع عالم المتاهة البسيط، وروبوت TurtleBot3 Burger، وجسر `ros_gz_bridge`، وعقدة `potential_field_planner`.
 
-```shell
-cd ~/ros2_project_ws
-source /opt/ros/jazzy/setup.bash
-rosdep install --from-paths src --ignore-src -r -y
-```
+## تخصيص معلمات الإطلاق
 
-### Step 5: Build the workspace
+يمكنك تعديل عالم المحاكاة، نقطة الانطلاق، ونقطة الهدف عن طريق تمرير المعلمات إلى ملف الإطلاق:
 
-```shell
-cd ~/ros2_project_ws
-source /opt/ros/jazzy/setup.bash
-colcon build --symlink-install
-```
-
-### Step 6: Source the workspace
-
-```shell
-source /opt/ros/jazzy/setup.bash
-source ~/ros2_project_ws/install/setup.bash
-export TURTLEBOT3_MODEL=burger
-```
-
-### Step 7: Launch the base project
-
-```shell
-ros2 launch maze_navigation maze_sim.launch.py
-```
-
-This launches:
-
-*   Gazebo with the simple maze world
-*   TurtleBot3 Burger at the default spawn point
-*   `ros_gz_bridge` for `/clock`, `/odom`, `/scan`, and `/cmd_vel`
-*   the base `potential_field_planner` node
-
-## Default Base Run
-
-The default launch configuration for the main/base project is:
-
-*   `world:=simple_maze.world`
-*   `spawn_x:=0.5`
-*   `spawn_y:=0.5`
-*   `goal_x:=9.0`
-*   `goal_y:=9.0`
-
-Equivalent explicit launch command:
-
-```shell
+```bash
 ros2 launch maze_navigation maze_sim.launch.py \
   world:=simple_maze.world \
   spawn_x:=0.5 \
@@ -163,127 +104,49 @@ ros2 launch maze_navigation maze_sim.launch.py \
   goal_y:=9.0
 ```
 
-## Custom Launch Parameters
+**أمثلة:**
 
-You can manually change the world, spawn point, and goal point:
+*   **تغيير الهدف:**
+    ```bash
+    ros2 launch maze_navigation maze_sim.launch.py goal_x:=8.0 goal_y:=8.5
+    ```
 
-```shell
-ros2 launch maze_navigation maze_sim.launch.py \
-  world:=simple_maze.world \
-  spawn_x:=0.5 \
-  spawn_y:=0.5 \
-  goal_x:=9.0 \
-  goal_y:=9.0
-```
+*   **تغيير نقطة الانطلاق:**
+    ```bash
+    ros2 launch maze_navigation maze_sim.launch.py spawn_x:=1.0 spawn_y:=1.0 goal_x:=9.0 goal_y:=9.0
+    ```
 
-### Example: different goal
+## استكشاف الأخطاء وإصلاحها
 
-```shell
-ros2 launch maze_navigation maze_sim.launch.py goal_x:=8.0 goal_y:=8.5
-```
+*   **`ros_gz_bridge` أو `ros_gz_sim` غير موجود:**
+    ```bash
+    sudo apt install ros-jazzy-ros-gz
+    ```
 
-### Example: different spawn point
+*   **`dynamixel_sdk` مفقود أثناء البناء:**
+    ```bash
+    sudo apt install ros-jazzy-dynamixel-sdk
+    ```
 
-```shell
-ros2 launch maze_navigation maze_sim.launch.py spawn_x:=1.0 spawn_y:=1.0 goal_x:=9.0 goal_y:=9.0
-```
+*   **Gazebo يعمل ولكن الروبوت لا يتحرك:**
+    تأكد من أن مساحة العمل تم بناؤها بنجاح، وأنك قمت بتفعيل ملفات `setup.bash`، وأن متغير البيئة `TURTLEBOT3_MODEL` مضبوط على `burger`، وأن عقدة المخطط (planner node) والجسر يعملان بشكل صحيح.
 
-## Results
+*   **ملف إطلاق جديد غير موجود بعد الإضافة:**
+    أعد بناء وتفعيل مساحة العمل:
+    ```bash
+    cd ~/ros2_project_ws
+    source /opt/ros/jazzy/setup.bash
+    colcon build --packages-select maze_navigation --symlink-install
+    source ~/ros2_project_ws/install/setup.bash
+    ```
 
-Base testing was performed in the simple maze with:
+## تحسينات مستقبلية محتملة
 
-*   **Start:** `(0.5, 0.5)`
-*   **Goal:** `(9.0, 9.0)`
-*   **Planner:** Potential Field
-*   **Goal tolerance:** `0.20 m`
+*   تطوير طرق أكثر قوة للهروب من النهايات الصغرى المحلية في المتاهات المعقدة.
+*   تحسين أدوات التصور والتصحيح.
+*   معايرة إضافية لتخطيطات متاهة مختلفة.
+*   تضمين أدوات تقييم وتسجيل أكثر شمولاً.
 
-In repeated runs, the robot consistently reached the goal region and stopped within the required tolerance.
+## شكر وتقدير
 
-## How the Planner Works
-
-The base planner uses a Potential Field method:
-
-*   **Attractive force:** pulls the robot toward the goal
-*   **Repulsive force:** pushes the robot away from nearby obstacles detected by LiDAR
-*   **Combined force:** determines the desired heading and forward motion
-
-The planner subscribes to:
-
-*   `/odom`
-*   `/scan`
-
-The planner publishes:
-
-*   `/cmd_vel`
-
-## Requirement Coverage
-
-The base implementation covers the following required items:
-
-*   **Robot selection and integration:** TurtleBot3 Burger integrated into a ROS 2 Jazzy workspace
-*   **Gazebo environment setup:** simple maze world launched in Gazebo Sim
-*   **Bridge setup:** `/scan`, `/odom`, `/cmd_vel`, and `/clock` bridged using `ros_gz_bridge`
-*   **Potential Field implementation:** attractive and repulsive force navigation
-*   **Invalid LiDAR handling:** invalid readings such as `0.0`, `inf`, and `nan` are filtered before force computation
-*   **Stopping condition:** robot stops when it reaches within **0.2 m** of the goal
-
-## Notes on Base Project Behavior
-
-*   Goal completion is evaluated using the robot's odometry position.
-*   The final stopping position may vary slightly between runs due to simulation timing and the continuous nature of Potential Field control.
-*   Small visual differences in the final stop position in the Gazebo GUI are acceptable as long as the robot stops within the required goal tolerance.
-*   The main/base project focuses on the **simple maze**. The complex maze is optional bonus work and is not required for the base submission.
-
-## Troubleshooting
-
-### `ros_gz_bridge` or `ros_gz_sim` not found
-
-Install:
-
-```shell
-sudo apt install ros-jazzy-ros-gz
-```
-
-### `dynamixel_sdk` missing during build
-
-Install:
-
-```shell
-sudo apt install ros-jazzy-dynamixel-sdk
-```
-
-### Gazebo opens but the robot does not move
-
-Check that:
-
-*   the workspace built successfully
-*   you sourced both setup files
-*   `TURTLEBOT3_MODEL=burger` is exported
-*   the planner node is running
-*   the bridge is running correctly
-
-### New launch file not found after adding files
-
-Rebuild and source the workspace again:
-
-```shell
-cd ~/ros2_project_ws
-source /opt/ros/jazzy/setup.bash
-colcon build --packages-select maze_navigation --symlink-install
-source ~/ros2_project_ws/install/setup.bash
-```
-
-### Simulation feels slow on WSL
-
-This project was tested on WSL Ubuntu 24.04. Gazebo performance may be slower depending on hardware, GPU support, and Windows graphics configuration. This may affect visualization smoothness but does not necessarily affect the correctness of the base navigation logic.
-
-## Future Improvements
-
-*   stronger local minima escape methods for complex mazes
-*   improved visualization and debugging tools
-*   additional tuning for different maze layouts
-*   more robust evaluation and logging utilities
-
-## Acknowledgment
-
-This work builds on the starter skeleton provided in **DSAI 4304: Robot Simulation** by **Dr. Marwan Radi**. The provided skeleton served as the initial foundation for the package structure and project setup, while the ROS 2 launch integration, Gazebo bridging, TurtleBot3 setup, Potential Field navigation logic, and testing were completed in this implementation.
+يستند هذا العمل إلى الهيكل الأساسي المقدم في مقرر **DSAI 4304: Robot Simulation** من قبل **الدكتور مروان راضي**. لقد وفر هذا الهيكل الأساس الأولي لبنية الحزمة وإعداد المشروع، بينما تم استكمال تكامل إطلاق ROS 2، وجسر Gazebo، وإعداد TurtleBot3، ومنطق الملاحة بحقل الجهد، والاختبار في هذا التنفيذ.
