@@ -69,7 +69,7 @@ sudo apt install -y \
 ```shell
 mkdir -p ~/ros2_project_ws/src
 cd ~/ros2_project_ws/src
-git clone https://github.com/YOUR_USERNAME/ros2-maze-navigation.git maze_navigation
+git clone https://github.com/Ahmedosrf/ros2-maze-navigation.git maze_navigation
 git clone -b jazzy https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git
 git clone -b jazzy https://github.com/ROBOTIS-GIT/turtlebot3.git
 git clone -b jazzy https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
@@ -94,7 +94,7 @@ cd ~/ros2_project_ws/src
 ### Step 2: Clone this repository
 
 ```shell
-git clone https://github.com/YOUR_USERNAME/ros2-maze-navigation.git maze_navigation
+git clone https://github.com/Ahmedosrf/ros2-maze-navigation.git maze_navigation
 ```
 
 ### Step 3: Clone the required TurtleBot3 repositories
